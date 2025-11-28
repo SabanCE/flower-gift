@@ -86,8 +86,6 @@
         }
 
         /* --- DURUM 1: Açık (.bloomed) - KOCAMAN ÇİÇEK --- */
-        /* Tıklanınca görünür (opacity: 1) oluyor ve pozisyonlarına gidiyorlar */
-        
         .flower-container.bloomed .petal:nth-child(1) { opacity: 1; transform: translate(-50%, -100%) rotate(0deg) scale(1.3); } 
         .flower-container.bloomed .petal:nth-child(2) { opacity: 1; transform: translate(-50%, -100%) rotate(45deg) scale(1.3); }
         .flower-container.bloomed .petal:nth-child(3) { opacity: 1; transform: translate(-50%, -100%) rotate(90deg) scale(1.3); }
@@ -169,6 +167,11 @@
 </head>
 <body onclick="handleGlobalClick()">
 
+    <audio id="myAudio" loop>
+        <source src="arka_plan_muzik.mp3" type="audio/mp3">
+        Tarayıcınız audio etiketini desteklemiyor.
+    </audio>
+
     <div class="flower-wrapper">
         <div class="flower-container" id="flower">
             <div class="stem"></div>
@@ -179,7 +182,7 @@
 
         <div class="message-container">
             <div id="message"></div>
-            <div class="hint" id="hintText">KLICKE AUF DIE BLUME<br></div>
+            <div class="hint" id="hintText">KLICKE AUF DIE BLUME<br>(Çiçeğe tıkla)</div>
         </div>
     </div>
 
@@ -187,6 +190,9 @@
         // --- MESAJLAR ---
         const text1 = "Guten Tag, liebe Lehrerin! Wie geht es Ihnen heute? 🌸";
         const text2 = "Ich hoffe, dieser kleine Code bringt Ihnen ein Lächeln ins Gesicht. 😊";
+
+        // --- MÜZİK DEĞİŞKENİ ---
+        const audioPlayer = document.getElementById('myAudio'); 
 
         // --- KONTROL DEĞİŞKENLERİ ---
         let clickState = 0; 
@@ -206,10 +212,17 @@
             if (isAnimating) return; 
             
             if (clickState === 0) {
-                // --- DURUM 1: Çiçek Açıyor ---
+                // --- DURUM 1: Çiçek Açıyor ve Müzik Başlatılıyor ---
                 isAnimating = true; 
                 flowerElement.classList.add('bloomed');
                 hintElement.style.display = 'none'; 
+                
+                // İlk tıklamada müziği başlat
+                audioPlayer.play().catch(error => {
+                    // Tarayıcılar genelde ilk etkileşimde (tıklamada) müziği başlatır.
+                    console.log("Müzik çalma girişimi başarısız oldu (Tarayıcı engeli olabilir): " + error);
+                });
+
 
                 setTimeout(() => {
                     startTypeWriter(text1);
@@ -219,7 +232,7 @@
                     // İkinci ipucu 
                     setTimeout(() => {
                         if (clickState === 1) {
-                            hintElement.innerHTML = "Klicke nochmal...<br>";
+                            hintElement.innerHTML = "Klicke nochmal...<br>(Bir daha tıkla...)";
                             hintElement.classList.add('stage2');
                             hintElement.style.display = 'block';
                         }
@@ -239,6 +252,8 @@
                     startTypeWriter(text2);
                     clickState = 2;
                     isAnimating = false;
+                    
+                    // Müzik çalmaya devam etsin
                 }, 1000);
             }
         }

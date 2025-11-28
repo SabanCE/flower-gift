@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Für die Beste Lehrerin</title>
+    <style>
+        /* --- Genel Ayarlar --- */
+        body {
+            background-color: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Courier New', Courier, monospace;
+            flex-direction: column;
+            overflow: hidden;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* --- Çiçek Ana Kapsayıcı --- */
+        .flower-wrapper {
+            position: relative;
+            height: 450px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .flower-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            z-index: 5;
+        }
+
+        /* --- Çiçek Bileşenleri --- */
+        .center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 60px;
+            height: 60px;
+            background: #ffcc00;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.7);
+            transition: all 0.5s;
+        }
+
+        .stem {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 12px;
+            height: 350px;
+            background: linear-gradient(to right, #0f776e, #2ecc71);
+            transform: translate(-50%, 0);
+            z-index: 0;
+            border-radius: 6px;
+        }
+
+        /* Yapraklar: Temel Boyutları Büyütüldü */
+        .petal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 80px; 
+            height: 160px; 
+            background: linear-gradient(to top, #ff758c 0%, #ff7eb3 100%);
+            border-radius: 80px;
+            transform-origin: bottom center;
+            
+            /* BAŞLANGIÇTA GÖRÜNMEZ VE YOK */
+            opacity: 0; 
+            transform: translate(-50%, -50%) scale(0);
+            
+            z-index: 1;
+            box-shadow: 0 0 10px rgba(255, 117, 140, 0.5);
+            transition: all 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
+        }
+
+        /* --- DURUM 1: Açık (.bloomed) - KOCAMAN ÇİÇEK --- */
+        /* Tıklanınca görünür (opacity: 1) oluyor ve pozisyonlarına gidiyorlar */
+        
+        .flower-container.bloomed .petal:nth-child(1) { opacity: 1; transform: translate(-50%, -100%) rotate(0deg) scale(1.3); } 
+        .flower-container.bloomed .petal:nth-child(2) { opacity: 1; transform: translate(-50%, -100%) rotate(45deg) scale(1.3); }
+        .flower-container.bloomed .petal:nth-child(3) { opacity: 1; transform: translate(-50%, -100%) rotate(90deg) scale(1.3); }
+        .flower-container.bloomed .petal:nth-child(4) { opacity: 1; transform: translate(-50%, -100%) rotate(135deg) scale(1.3); }
+        .flower-container.bloomed .petal:nth-child(5) { opacity: 1; transform: translate(-50%, -100%) rotate(180deg) scale(1.3); }
+        .flower-container.bloomed .petal:nth-child(6) { opacity: 1; transform: translate(-50%, -100%) rotate(225deg) scale(1.3); }
+        .flower-container.bloomed .petal:nth-child(7) { opacity: 1; transform: translate(-50%, -100%) rotate(270deg) scale(1.3); }
+        .flower-container.bloomed .petal:nth-child(8) { opacity: 1; transform: translate(-50%, -100%) rotate(315deg) scale(1.3); }
+        
+        /* Merkez de biraz büyüsün */
+        .flower-container.bloomed .center { background: #ffd700; box-shadow: 0 0 30px rgba(255, 215, 0, 0.9); transform: translate(-50%, -50%) scale(1.1); }
+
+
+        /* --- DURUM 2: Dökülen (.fallen) --- */
+        .flower-container.fallen .petal {
+            opacity: 0 !important;
+            box-shadow: none;
+            transition: transform 3s ease-in, opacity 2.5s ease-in; 
+            transform: translate(-50%, 600px) rotate(var(--fall-rotation)) !important; 
+        }
+        
+        .flower-container.fallen .center { background: #cc9900; box-shadow: 0 0 5px rgba(204, 153, 0, 0.5); transform: translate(-50%, -50%) scale(1.0); }
+
+        /* Rastgele düşüş açıları */
+        .flower-container.fallen .petal:nth-child(1) { --fall-rotation: 60deg; transition-delay: 0.1s; }
+        .flower-container.fallen .petal:nth-child(2) { --fall-rotation: -45deg; transition-delay: 0.3s; }
+        .flower-container.fallen .petal:nth-child(3) { --fall-rotation: 120deg; transition-delay: 0.0s; }
+        .flower-container.fallen .petal:nth-child(4) { --fall-rotation: -90deg; transition-delay: 0.4s; }
+        .flower-container.fallen .petal:nth-child(5) { --fall-rotation: 180deg; transition-delay: 0.2s; }
+        .flower-container.fallen .petal:nth-child(6) { --fall-rotation: -135deg; transition-delay: 0.5s; }
+        .flower-container.fallen .petal:nth-child(7) { --fall-rotation: 90deg; transition-delay: 0.15s; }
+        .flower-container.fallen .petal:nth-child(8) { --fall-rotation: -30deg; transition-delay: 0.25s; }
+
+        /* --- Mesaj Alanı --- */
+        .message-container {
+            margin-top: 200px;
+            text-align: center;
+            z-index: 10;
+            width: 90%;
+            max-width: 600px;
+        }
+
+        #message {
+            color: #eee;
+            font-size: 1.2rem;
+            min-height: 3em; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+            font-weight: bold;
+            line-height: 1.5;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            background-color: #eee;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        .hint {
+            color: #ff7eb3;
+            font-size: 1.4rem;
+            font-weight: bold;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.05); opacity: 1; text-shadow: 0 0 10px #ff7eb3; }
+            100% { transform: scale(1); opacity: 0.9; }
+        }
+        
+        .hint.stage2 { color: #ffd700; font-size: 1.1rem; }
+    </style>
+</head>
+<body onclick="handleGlobalClick()">
+
+    <div class="flower-wrapper">
+        <div class="flower-container" id="flower">
+            <div class="stem"></div>
+            <div class="petal"></div> <div class="petal"></div> <div class="petal"></div> <div class="petal"></div>
+            <div class="petal"></div> <div class="petal"></div> <div class="petal"></div> <div class="petal"></div>
+            <div class="center"></div>
+        </div>
+
+        <div class="message-container">
+            <div id="message"></div>
+            <div class="hint" id="hintText">KLICKE AUF DIE BLUME<br></div>
+        </div>
+    </div>
+
+    <script>
+        // --- MESAJLAR ---
+        const text1 = "Guten Tag, liebe Lehrerin! Wie geht es Ihnen heute? 🌸";
+        const text2 = "Ich hoffe, dieser kleine Code bringt Ihnen ein Lächeln ins Gesicht. 😊";
+
+        // --- KONTROL DEĞİŞKENLERİ ---
+        let clickState = 0; 
+        let charIndex = 0;
+        let currentText = "";
+        const typeSpeed = 50; 
+        let isAnimating = false;
+        
+        // --- DOM ELEMANLARI ---
+        const messageElement = document.getElementById("message");
+        const hintElement = document.getElementById("hintText");
+        const flowerElement = document.getElementById('flower');
+
+
+        // --- ANA TIKLAMA FONKSİYONU ---
+        function handleGlobalClick() {
+            if (isAnimating) return; 
+            
+            if (clickState === 0) {
+                // --- DURUM 1: Çiçek Açıyor ---
+                isAnimating = true; 
+                flowerElement.classList.add('bloomed');
+                hintElement.style.display = 'none'; 
+
+                setTimeout(() => {
+                    startTypeWriter(text1);
+                    clickState = 1;
+                    isAnimating = false; 
+                    
+                    // İkinci ipucu 
+                    setTimeout(() => {
+                        if (clickState === 1) {
+                            hintElement.innerHTML = "Klicke nochmal...<br>";
+                            hintElement.classList.add('stage2');
+                            hintElement.style.display = 'block';
+                        }
+                    }, 4000);
+                }, 1000);
+
+            } else if (clickState === 1) {
+                // --- DURUM 2: Yapraklar Dökülüyor ---
+                isAnimating = true;
+                flowerElement.classList.remove('bloomed');
+                void flowerElement.offsetWidth;
+                flowerElement.classList.add('fallen');
+                hintElement.style.display = 'none';
+                messageElement.innerHTML = "";
+                
+                setTimeout(() => {
+                    startTypeWriter(text2);
+                    clickState = 2;
+                    isAnimating = false;
+                }, 1000);
+            }
+        }
+
+        // --- DAKTİLO EFEKTİ FONKSİYONLARI ---
+        function startTypeWriter(txt) {
+            currentText = txt;
+            charIndex = 0;
+            messageElement.innerHTML = ""; 
+            typeWriter();
+        }
+
+        function typeWriter() {
+            if (charIndex < currentText.length) {
+                messageElement.innerHTML += currentText.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeWriter, typeSpeed);
+            } else {
+                messageElement.innerHTML += '<span class="cursor">|</span>';
+            }
+        }
+    </script>
+</body>
+</html>
